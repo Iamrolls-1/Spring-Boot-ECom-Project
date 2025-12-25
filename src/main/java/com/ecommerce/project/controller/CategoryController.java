@@ -32,6 +32,7 @@ public class CategoryController {
     @PostMapping("api/public/categories")
     public ResponseEntity<String> addCategory(@RequestBody Category category) {
         categoryService.createCategory(category);
+//        System.out.println("Inside PostMapping");
         return new ResponseEntity<>("Category added Successfully..!!",HttpStatus.CREATED);
 //        return category.getCategoryId() + ", "  + category.getCategoryName() + " " +" Added Successfully..!!";
     }
@@ -48,12 +49,15 @@ public class CategoryController {
     }
 
 
-    @DeleteMapping("api/admin/categories/{categoryId}")
+    @PutMapping("api/public/categories/{categoryId}")
     public ResponseEntity<String> updateCategory(@RequestBody Category category, @PathVariable Long categoryId) {
 
         try {
 //            Category updatedCategory = categoryService. (category, categoryId);
-            return new ResponseEntity<>("Updated Data: "+updatedCategory,HttpStatus.ACCEPTED);
+
+//            System.out.println("Inside PutMapping");
+            String status = categoryService.updateCategory(category, categoryId);
+            return new ResponseEntity<>(status,HttpStatus.CREATED);
 
         }catch (ResponseStatusException e){
             return new ResponseEntity<>(e.getReason(), e.getStatusCode());
