@@ -31,6 +31,7 @@ public class CategoryController {
 
     @PostMapping("api/public/categories")
     public ResponseEntity<String> addCategory(@RequestBody Category category) {
+        System.out.println("Inside PostMapping Controller");
         categoryService.createCategory(category);
 //        System.out.println("Inside PostMapping");
         return new ResponseEntity<>("Category added Successfully..!!",HttpStatus.CREATED);
