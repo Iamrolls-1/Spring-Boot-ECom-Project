@@ -17,7 +17,7 @@ public class ResourceNotFoundException extends RuntimeException {
     }
 
     public ResourceNotFoundException(String resourceName, String field, Long fieldId) {
-        super("Resource: " + resourceName + " with field ID: " + fieldId + " and field : " + field + " not found");
+        super("Resource: " + resourceName + " with field : " + field + " and field ID: " + fieldId + " not found");
         this.resourceName = resourceName;
         this.field = field;
         this.fieldId = fieldId;

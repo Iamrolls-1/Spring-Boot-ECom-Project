@@ -1,6 +1,8 @@
 package com.ecommerce.project.controller;
 
 import com.ecommerce.project.model.Category;
+import com.ecommerce.project.payload.CategoryDTO;
+import com.ecommerce.project.payload.CategoryResponse;
 import com.ecommerce.project.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,17 +27,20 @@ public class CategoryController {
 //    private CategoryService categoryService;
 
     @GetMapping("api/public/categories")
-    public ResponseEntity<List<Category>> getAllCategories() {
-        List<Category> categories = categoryService.getAllCategories();
-        return new ResponseEntity<>(categories,HttpStatus.OK);
+    public ResponseEntity<CategoryResponse> getAllCategories() {
+//        List<Category> categories = categoryService.getAllCategories();
+//        return new ResponseEntity<>(categories,HttpStatus.OK);
+
+        CategoryResponse categoryResponse = categoryService.getAllCategories();
+        return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
     }
 
     @PostMapping("api/public/categories")
-    public ResponseEntity<String> addCategory(@Valid @RequestBody Category category) {
+    public ResponseEntity<CategoryDTO> addCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
 //        System.out.println("Inside PostMapping Controller");
-        categoryService.createCategory(category);
+        CategoryDTO savedCategoryDTO = categoryService.createCategory(categoryDTO);
 //        System.out.println("Inside PostMapping");
-        return new ResponseEntity<>("Category added Successfully..!!",HttpStatus.CREATED);
+        return new ResponseEntity<>(savedCategoryDTO, HttpStatus.CREATED);
 //        return category.getCategoryId() + ", "  + category.getCategoryName() + " " +" Added Successfully..!!";
     }
 
@@ -43,8 +48,8 @@ public class CategoryController {
     public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
         try {
             String status = categoryService.deleteCategory(categoryId);
-            return new  ResponseEntity(status, HttpStatus.OK);
-        }catch (ResponseStatusException e){
+            return new ResponseEntity(status, HttpStatus.OK);
+        } catch (ResponseStatusException e) {
             return new ResponseEntity<>(e.getReason(), e.getStatusCode());
         }
 
@@ -52,17 +57,17 @@ public class CategoryController {
 
 
     @PutMapping("api/public/categories/{categoryId}")
-    public ResponseEntity<String> updateCategory(@RequestBody Category category, @PathVariable Long categoryId) {
+    public ResponseEntity<CategoryDTO> updateCategory(@RequestBody CategoryDTO categoryDTO, @PathVariable Long categoryId) {
 
         try {
 //            Category updatedCategory = categoryService. (category, categoryId);
 
 //            System.out.println("Inside PutMapping");
-            String status = categoryService.updateCategory(category, categoryId);
-            return new ResponseEntity<>(status,HttpStatus.CREATED);
+            CategoryDTO savedCategotyDTO = categoryService.updateCategory(categoryDTO, categoryId);
+            return new ResponseEntity<>(savedCategotyDTO, HttpStatus.CREATED);
 
-        }catch (ResponseStatusException e){
-            return new ResponseEntity<>(e.getReason(), e.getStatusCode());
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(categoryDTO, e.getStatusCode());
         }
     }
 }

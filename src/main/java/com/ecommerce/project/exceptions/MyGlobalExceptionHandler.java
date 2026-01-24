@@ -1,5 +1,6 @@
 package com.ecommerce.project.exceptions;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,14 @@ public class MyGlobalExceptionHandler {
             response.put(fieldName, errorMessage);
         });
         return new ResponseEntity<Map<String, String>>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<String> myConstraintViolationException(ConstraintViolationException e) {
+
+        String message = e.getMessage();
+        return new ResponseEntity<>(message,HttpStatus.BAD_REQUEST);
+
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
