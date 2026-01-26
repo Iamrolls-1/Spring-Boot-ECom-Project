@@ -27,11 +27,12 @@ public class CategoryController {
 //    private CategoryService categoryService;
 
     @GetMapping("api/public/categories")
-    public ResponseEntity<CategoryResponse> getAllCategories() {
+    public ResponseEntity<CategoryResponse> getAllCategories(@RequestParam(name = "pageNumber") Integer pageNumber, @RequestParam(name = "pageSize") Integer pageSize) {
 //        List<Category> categories = categoryService.getAllCategories();
 //        return new ResponseEntity<>(categories,HttpStatus.OK);
 
-        CategoryResponse categoryResponse = categoryService.getAllCategories();
+
+        CategoryResponse categoryResponse = categoryService.getAllCategories(pageNumber,pageSize);
         return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
     }
 
@@ -45,12 +46,12 @@ public class CategoryController {
     }
 
     @DeleteMapping("api/admin/categories/{categoryId}")
-    public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<CategoryDTO> deleteCategory(@PathVariable Long categoryId) {
         try {
-            String status = categoryService.deleteCategory(categoryId);
-            return new ResponseEntity(status, HttpStatus.OK);
+            CategoryDTO deletedCategoryDTO = categoryService.deleteCategory(categoryId);
+            return new ResponseEntity(deletedCategoryDTO, HttpStatus.OK);
         } catch (ResponseStatusException e) {
-            return new ResponseEntity<>(e.getReason(), e.getStatusCode());
+            return new ResponseEntity<>(e.getStatusCode());
         }
 
     }
@@ -69,5 +70,12 @@ public class CategoryController {
         } catch (ResponseStatusException e) {
             return new ResponseEntity<>(categoryDTO, e.getStatusCode());
         }
+    }
+
+    @GetMapping("/echo")
+//    public ResponseEntity<String> echoMessage(@RequestParam(name = "message", defaultValue = "Please send some message") String message) {
+//    public ResponseEntity<String> echoMessage(@RequestParam(name = "message", required = false) String message) {
+    public ResponseEntity<String> echoMessage(@RequestParam(name = "message") String message) {
+        return new ResponseEntity<>("Echoed message: " + message, HttpStatus.OK);
     }
 }

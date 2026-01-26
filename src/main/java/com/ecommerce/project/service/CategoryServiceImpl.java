@@ -9,6 +9,9 @@ import jakarta.validation.ConstraintViolationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,7 +26,7 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-//    private List<Category> categories = new ArrayList<>();
+    //    private List<Category> categories = new ArrayList<>();
     @Autowired
     CategoryRepository categoryRepository;
 
@@ -32,10 +35,12 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public CategoryResponse getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        if(categories.isEmpty())
-        {
+    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize) {
+
+        Pageable pageDetails = PageRequest.of(pageNumber, pageSize);
+        Page<Category> categoryPage = categoryRepository.findAll(pageDetails);
+        List<Category> categories = categoryPage.getContent();
+        if (categories.isEmpty()) {
             return null;
         }
 
@@ -44,6 +49,11 @@ public class CategoryServiceImpl implements CategoryService {
                 .toList();
         CategoryResponse categoryResponse = new CategoryResponse();
         categoryResponse.setContent(categoryDTOs);
+        categoryResponse.setPageNumber(categoryPage.getNumber());
+        categoryResponse.setPageSize(categoryPage.getSize());
+        categoryResponse.setTotalElements(categoryPage.getTotalElements());
+        categoryResponse.setTotalPages(categoryPage.getTotalPages());
+        categoryResponse.setLastPage(categoryPage.isLast());
         return categoryResponse;
     }
 
@@ -57,12 +67,14 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public String deleteCategory(Long categoryId) {
+    public CategoryDTO deleteCategory(Long categoryId) {
         List<Category> categories = categoryRepository.findAll();
-        Category category = categories.stream().filter(c -> c.getCategoryId().equals(categoryId)).findFirst().orElseThrow(() -> new ResourceNotFoundException("Category","CategoryId",categoryId));
-
-        categoryRepository.delete(category);
-        return "Category deleted Successfully..!!";
+        Optional<Category> category = categories.stream().filter(c -> c.getCategoryId().equals(categoryId)).findFirst();
+        Category deleteCategory = category.get();
+        if(deleteCategory == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        categoryRepository.delete(deleteCategory);
+        return modelMapper.map(category, CategoryDTO.class);
 //        return "Category not found..!!";
 
     }
@@ -70,7 +82,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO updateCategory(CategoryDTO categoryDTO, Long categoryId) {
 
-         Optional<Category> categories = categoryRepository.findById(categoryId);
+        Optional<Category> categories = categoryRepository.findById(categoryId);
 //        Optional<Category> optionalCategory = categories.stream().filter(c -> c.getCategoryId().equals(categoryId)).findFirst();
 
 //        if (categories.isEmpty()) {
